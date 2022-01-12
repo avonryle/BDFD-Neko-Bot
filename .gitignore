@@ -1,0 +1,16 @@
+# Generated files from IDEs
+.idea
+.vscode
+
+# Non-shareable data
+*/config.json
+
+# Database files
+*.sqlite
+*.db
+
+# Modules
+node_modules
+
+# Compiled code
+dist
