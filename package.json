@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
+    "commit": "node dist/__tests__/git.js",
     "bot": "tsc && node .",
     "test": "tsc && node dist/__tests__/runner.js"
   },
