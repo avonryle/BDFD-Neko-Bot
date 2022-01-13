@@ -1,3 +1,4 @@
+import { LogExecutionTime } from "../util/decorators/LogExecutionTime";
 import {WrapMethodWithErrorHandler} from "../util/decorators/WrapMethodWithErrorHandler";
 
 class test {
@@ -6,6 +7,7 @@ class test {
     }
 
     @WrapMethodWithErrorHandler()
+    @LogExecutionTime()
     err() {
         throw new Error("woah")
         return 10
