@@ -3,9 +3,11 @@ import { Message } from "discord.js";
 import { NekoClient } from "../core/NekoClient";
 import cast from "../functions/cast";
 import removeScripts from "../functions/removeScripts";
+import { ArgData } from "../typings/interfaces/ArgData";
 import { CommandData } from "../typings/interfaces/CommandData";
 import { ExtrasData } from "../typings/interfaces/ExtrasData";
 import { Async } from "../typings/types/Async";
+import { RejectionTypes } from "../typings/types/RejectionTypes";
 import { AsyncLogExecutionTime } from "../util/decorators/LogExecutionTime";
 import { WrapAsyncMethodWithErrorHandler } from "../util/decorators/WrapMethodWithErrorHandler";
 
@@ -79,13 +81,35 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
         for (let i = 0, len = this.data.args.length;i < len;i++) {
             const raw = this.data.args[i]
             const arg = typeof raw === 'function' ? await raw.call(client, message) : raw
-            
+
             const current = i + 1 === len ? rawArgs.slice(i).join(' ') || undefined : rawArgs[i]
 
+            const reject = this.reject.bind(
+                this,
+                client,
+                message,
+                arg,
+                extras
+            ).bind(
+                this,
+                current
+            )
             
         }
 
         return parsedArgs
+    }
+
+    async reject(
+        client: NekoClient,
+        message: Message,
+        arg: ArgData,
+        extras: ExtrasData<K>,
+        input: string | undefined,
+        type: RejectionTypes
+    ): Promise<false> {
+
+        return false
     }
 
     async permissionsFor(client: NekoClient, message: Message): Promise<boolean> {
