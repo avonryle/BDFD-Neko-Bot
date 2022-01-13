@@ -1,8 +1,11 @@
 import { capture, ParsedContentData } from "arg-capturer";
 import { Message } from "discord.js";
+import { type } from "os";
 import { NekoClient } from "../core/NekoClient";
 import cast from "../functions/cast";
 import removeScripts from "../functions/removeScripts";
+import { ArgType } from "../typings/enums/ArgType";
+import { RejectionType } from "../typings/enums/RejectionType";
 import { ArgData } from "../typings/interfaces/ArgData";
 import { CommandData } from "../typings/interfaces/CommandData";
 import { ExtrasData } from "../typings/interfaces/ExtrasData";
@@ -76,7 +79,7 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
     async parseArgs(client: NekoClient, message: Message, rawArgs: string[], extras: ExtrasData<K>): Promise<T | false> {
         if (!this.data.args?.length) return [ rawArgs.join(' ') ] as unknown as T
 
-        const parsedArgs: T = cast([])
+        const parsedArgs: unknown[] = []
 
         for (let i = 0, len = this.data.args.length;i < len;i++) {
             const raw = this.data.args[i]
@@ -95,9 +98,26 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
                 current
             )
             
+            if (!current) {
+                if (arg.required) {
+                    return reject(RejectionType.EMPTY)
+                }
+                parsedArgs.push(null)
+                continue
+            }
+
+            let data: unknown = current
+
+            switch(arg.type) {
+                case 'STRING':
+                case ArgType.STRING: {
+
+                    break
+                }
+            }
         }
 
-        return parsedArgs
+        return parsedArgs as unknown as T 
     }
 
     async reject(
@@ -106,7 +126,7 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
         arg: ArgData,
         extras: ExtrasData<K>,
         input: string | undefined,
-        type: RejectionTypes
+        type: RejectionType
     ): Promise<false> {
 
         return false
