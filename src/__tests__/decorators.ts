@@ -1,4 +1,4 @@
-import WrapMethodWithErrorHandler from "../util/decorators/WrapMethodWithErrorHandler";
+import {WrapMethodWithErrorHandler} from "../util/decorators/WrapMethodWithErrorHandler";
 
 class test {
     constructor() {
