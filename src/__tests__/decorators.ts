@@ -9,7 +9,7 @@ class test {
     @WrapMethodWithErrorHandler()
     @LogExecutionTime()
     err() {
-        throw new Error("woah")
+
         return 10
     }
 }
