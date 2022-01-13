@@ -2,7 +2,7 @@ import { Client, ClientOptions } from "discord.js";
 import { BuildType } from "../typings/enums/BuildType";
 import config from "../config.json"
 
-export class NekoClient extends Client {
+export class NekoClient extends Client<true> {
     #mode!: BuildType
     
     constructor(options: ClientOptions) {
