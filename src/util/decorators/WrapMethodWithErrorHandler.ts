@@ -18,7 +18,7 @@ export function WrapMethodWithErrorHandler(channel = false) {
         const fn = descriptor.value! as UnknownMethod
 
         descriptor.value = function(this: any, ...args: unknown[]) {
-            return ErrorHandler.wrap(fn, findMessage(channel, args)?.channel).run(this, ...args)
+            return ErrorHandler.wrap(fn, findMessage(channel, args)?.channel).setName(property).run(this, ...args)
         }
     }
 }
@@ -28,7 +28,7 @@ export function WrapAsyncMethodWithErrorHandler(channel = false) {
         const fn = descriptor.value! as UnknownMethod
 
         descriptor.value = async function(this: any, ...args: unknown[]) {
-            return await ErrorHandler.wrap(fn, findMessage(channel, args)?.channel).runAsync(this, ...args)
+            return await ErrorHandler.wrap(fn, findMessage(channel, args)?.channel).setName(property).runAsync(this, ...args)
         }
     }
 }

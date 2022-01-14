@@ -1,5 +1,5 @@
 import { capture, ParsedContentData } from "arg-capturer";
-import { GuildChannel, Message } from "discord.js";
+import { GuildChannel, Message, MessageEmbed } from "discord.js";
 import { type } from "os";
 import { NekoClient } from "../core/NekoClient";
 import cast from "../functions/cast";
@@ -10,6 +10,8 @@ import inRange from "../functions/inRange";
 import matches from "../functions/matches";
 import noop from "../functions/noop";
 import removeScripts from "../functions/removeScripts";
+import { toPlural } from "../functions/toPlural";
+import toTitleCase from "../functions/toTitleCase";
 import { ArgType } from "../typings/enums/ArgType";
 import { RejectionType } from "../typings/enums/RejectionType";
 import { ArgData } from "../typings/interfaces/ArgData";
@@ -75,7 +77,7 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
             commandString: cmd
         }
 
-        const args = await command.parseArgs(client, message, rawArgs, extras)
+        const args = await command.parseArgs(client, message, capturedArgs, extras)
 
         if (!args) return;
         
@@ -216,9 +218,49 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
                     break
                 }
             }
+
+            parsedArgs.push(data)
         }
 
         return parsedArgs as unknown as T 
+    }
+
+    async usage(client: NekoClient, message: Message, extras: ExtrasData<K>): Promise<string[]> {
+        if (!this.data.args?.length) return []
+
+        const args = new Array<ArgData>()
+
+        let x = -1
+
+        for (let i = 0, len = this.data.args.length;i < len;i++) {
+            const raw = this.data.args[i]
+            const arg = typeof raw === 'function' ? await raw.call(client, message) : raw
+
+            args.push(arg)
+            if (!arg.required && x === -1) {
+                x = i
+            }
+        }
+
+        if (x === -1) {
+            return [
+                `${extras.prefix}${extras.commandString} ${args.map(c => `<${c.name}>`).join(' ')}`
+            ]
+        }
+
+        const parsed = new Array<string>(
+            `${extras.prefix}${extras.commandString} ${args.slice(0, x).map(c => `<${c.name}>`).join(' ')}`
+        )
+
+        const optional = args.slice(x)
+
+        for (let i = 0, len = optional.length;i < len;i++) {
+            const total = args.slice(0, i + x)
+
+            parsed.push(`${extras.prefix}${extras.commandString} ${args.map(c => c.required ? `<${c.name}>` : `[${c.name}]`).join(' ')}`)
+        }
+
+        return parsed 
     }
 
     async reject(
@@ -229,6 +271,60 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
         input: string | undefined,
         type: RejectionType
     ): Promise<false> {
+        const embed = new MessageEmbed()
+        .setColor('RED')
+        .setAuthor({
+            name: message.author.tag,
+            iconURL: message.member?.displayAvatarURL({ dynamic: true })
+        })
+        .setTimestamp()
+        .setTitle(`Argument Error`)
+
+        embed.setDescription(
+            type === RejectionType.CHOICE ? `Given input does not match any of the choices that \`${arg.name}\` provides.` :
+            type === RejectionType.EMPTY ? `No input was given for argument \`${arg.name}\`.` :
+            type === RejectionType.RANGE ? `Given input is not in the range of the argument \`${arg.name}\`.` :
+            type === RejectionType.REGEX ? `Given input does not match the provided regexes by \`${arg.name}\`.` :
+            type === RejectionType.TYPE ? `Given input does not match the type of \`${arg.type}\`.` : "none"
+        )
+
+        const usage = await this.usage(client, message, extras)
+
+        embed.addField(`Given`, input || 'None')
+        .addField(`Expected`, toTitleCase(typeof arg.type === 'number' ? ArgType[arg.type] : arg.type))
+        
+        if (arg.min !== undefined || arg.max !== undefined) {
+            const isTime = arg.type === ArgType.TIME || arg.type === 'TIME'
+
+            embed.addField(`Range`, `${
+                arg.min ? isTime ? client.manager.parser.parseToString(arg.min, { limit: 1 }) : arg.min.toLocaleString() : '?'
+            } - ${
+                arg.max ? isTime ? client.manager.parser.parseToString(arg.max, { limit: 1 }) : arg.max.toLocaleString() : '?'
+            }`)
+        }
+
+        if (arg.regexes?.length) {
+            embed.addField(`Regexes`, arg.regexes.map(c => `\`${c.source}\``).join(', '))
+        }
+
+        if (arg.choices?.length) {
+            embed.addField('Choices', arg.choices.map(c => `\`${c.name}\``).join(', '))
+        } 
+
+        if (usage.length) {
+            embed.addField(`Command ${toPlural(`Usage`, usage.length)}`, `\`\`\`\n${usage.join('\n')}\`\`\``)
+        }
+
+        if (arg.pointer) {
+            embed.addField(`Pointed Argument`, arg.pointer.toLocaleString())
+        }
+
+        message.channel.send({
+            embeds: [
+                embed
+            ]
+        })
+        .catch(noop)
 
         return false
     }

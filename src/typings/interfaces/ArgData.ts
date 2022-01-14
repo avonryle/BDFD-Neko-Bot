@@ -1,4 +1,5 @@
 import { ArgTypes } from "../types/ArgTypes"
+import { ChoiceData } from "./ChoiceData"
 
 export interface ArgData {
     name: string
@@ -6,7 +7,7 @@ export interface ArgData {
     required?: boolean
     regexes?: RegExp[]
     pointer?: number
-    choices?: unknown[]
+    choices?: ChoiceData[]
     min?: number
     max?: number
 }

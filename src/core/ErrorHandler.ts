@@ -9,6 +9,7 @@ import { UnknownMethod } from "../typings/types/UnknownMethod";
 export class ErrorHandler<T  extends UnknownMethod> {
     #func: T 
     #channel = option<TextBasedChannel>()
+    #name = option<string>()
 
     constructor(fn: T, channel?: Option<TextBasedChannel>) {
         this.#func = fn     
@@ -22,18 +23,28 @@ export class ErrorHandler<T  extends UnknownMethod> {
         return this
     }
 
+    setName(name: Option<string>) {
+        this.#name = name
+        return this
+    }
+
     get name() {
-        return this.#func.name
+        return this.#func.name || this.#name
     }
     
+    commandName(thisArg: any): Option<string> {
+        return thisArg?.data?.name ?? null 
+    }
+
     #handle(thisArg: any, error: Error): null {
+        const cmdName = this.commandName(thisArg)
         const cons = thisArg === null ? null : thisArg?.constructor.name === 'Function' ? null : thisArg?.constructor.name  ?? null
 
         if (!this.#channel) {
-            console.error(`${chalk.red.bold(`[ERROR HANDLER]`)} => ${chalk.yellow.bold(error.message)} from ${cons ? chalk.blue.bold(`${cons}#`) : ''}${chalk.magenta.bold(this.name)}.`)
+            console.error(`${chalk.red.bold(`[ERROR HANDLER]`)} => ${chalk.yellow.bold(error.message)} from ${cons ? chalk.blue.bold(`${cons}#`) : ''}${chalk.magenta.bold(this.name)} ${this.name}${cmdName ? `( ${chalk.magenta.bold(cmdName)})` : ''}.`)
         } else {
             this.#channel.send({
-                content: `[ERROR HANDLER] => ${error.message} from ${cons ? `${cons}#` : ''}${this.name}`
+                content: `[ERROR HANDLER] => ${error.message} from ${cons ? `${cons}#` : ''}${this.name}${cmdName ? ` (${cmdName})` : ''}`
             }).catch(noop)
         }
         
