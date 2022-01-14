@@ -14,7 +14,10 @@ export default [
         {
             letter: 'm',
             word: 'minute',
-            ms: 60_000
+            ms: 60_000,
+            aliases: [
+                'min'
+            ]
         }
     ],
     [    
@@ -22,7 +25,10 @@ export default [
         {
             letter: 's',
             word: 'second',
-            ms: 1_000
+            ms: 1_000,
+            aliases: [
+                'sec'
+            ]
         }
     ],
     [

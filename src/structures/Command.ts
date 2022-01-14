@@ -145,7 +145,7 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
                 case 'TIME':
                 case ArgType.TIME: {
                     try {
-                        const time = client.manager.parser.parseToMS(current)
+                        const time = client.manager.parser.advancedParseToMS(current)
                         if (inRange(time, arg.min, arg.max)) return reject(RejectionType.RANGE)
 
                         data = time 

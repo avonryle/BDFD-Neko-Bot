@@ -49,6 +49,14 @@ export class NekoClient extends Client<true> {
     get config() {
         return config
     }
+
+    get mainGuild() {
+        return this.guilds.cache.get(this.build.main_guild_id)!
+    }
+
+    get appealsGuild() {
+        return this.guilds.cache.get(this.build.appeals_guild_id)!
+    }
     
     @WrapAsyncMethodWithErrorHandler()
     async init(mode: BuildType) {
