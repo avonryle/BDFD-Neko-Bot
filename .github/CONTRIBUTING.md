@@ -8,9 +8,13 @@ The file looks as follows:
         "+"
     ],
     "test_build": {
+        "main_guild_id": "",
+        "appeals_guild_id": "",
         "token": ""
     },
     "public_build": {
+        "main_guild_id": "",
+        "appeals_guild_id": "",
         "token": ""
     }
 }
