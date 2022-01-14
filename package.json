@@ -18,7 +18,7 @@
     "arg-capturer": "^1.0.1",
     "chalk": "^4.1.2",
     "dbdts.db": "^4.0.1",
-    "discord.js": "^13.5.1",
+    "discord.js": "^13.6.0",
     "ms-utility": "^3.2.0"
   }
 }
