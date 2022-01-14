@@ -1,8 +1,14 @@
 import { capture, ParsedContentData } from "arg-capturer";
-import { Message } from "discord.js";
+import { GuildChannel, Message } from "discord.js";
 import { type } from "os";
 import { NekoClient } from "../core/NekoClient";
 import cast from "../functions/cast";
+import cleanID from "../functions/cleanID";
+import createSelector from "../functions/createSelector";
+import fetchMember from "../functions/fetchMember";
+import inRange from "../functions/inRange";
+import matches from "../functions/matches";
+import noop from "../functions/noop";
 import removeScripts from "../functions/removeScripts";
 import { ArgType } from "../typings/enums/ArgType";
 import { RejectionType } from "../typings/enums/RejectionType";
@@ -111,7 +117,102 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
             switch(arg.type) {
                 case 'STRING':
                 case ArgType.STRING: {
+                    const range = inRange(current.length, arg.min, arg.max)
 
+                    if (!range) return reject(RejectionType.RANGE)
+
+                    if (!matches(current, arg.regexes)) return reject(RejectionType.REGEX)
+
+                    break
+                }
+
+                case 'NUMBER':
+                case ArgType.NUMBER: {
+                    const n = Number(current)
+
+                    if (isNaN(n)) return reject(RejectionType.TYPE)
+
+                    if (n > Number.MAX_SAFE_INTEGER || n < Number.MIN_SAFE_INTEGER) return reject(RejectionType.RANGE)
+
+                    if (!inRange(n, arg.min, arg.max)) return reject(RejectionType.RANGE)
+
+                    data = n 
+                    break
+                }
+
+                case 'TIME':
+                case ArgType.TIME: {
+                    try {
+                        const time = client.manager.parser.parseToMS(current)
+                        if (inRange(time, arg.min, arg.max)) return reject(RejectionType.RANGE)
+
+                        data = time 
+                        break
+                    } catch (error) {
+                        return reject(RejectionType.TYPE)
+                    }
+                }
+
+                case 'CHANNEL':
+                case ArgType.CHANNEL: {
+                    const channel = message.guild?.channels.cache.get(cleanID(current)) ?? message.guild?.channels.cache.filter(
+                        c => c.name === current || !!~removeScripts(c.name).indexOf(removeScripts(current))
+                    )
+
+                    const selector = await createSelector(
+                        message,
+                        channel
+                    )
+
+                    if (selector === undefined) return reject(RejectionType.TYPE)
+
+                    if (selector === null) return false;
+
+                    data = selector
+                    break
+                }
+
+                case 'MEMBER':
+                case ArgType.MEMBER: {
+                    const member = await fetchMember(
+                        message.guild!,
+                        current
+                    )
+
+                    const selector = await createSelector(
+                        message,
+                        member
+                    )
+
+                    if (selector === undefined) return reject(RejectionType.TYPE)
+
+                    if (selector === null) return false;
+
+                    data = selector
+                    break
+                }
+
+                case 'USER':
+                case ArgType.USER: {
+                    const user = await client.users.fetch(cleanID(current)).catch(noop)
+
+                    if (!user) return reject(RejectionType.TYPE)
+
+                    data = user
+                    break
+                }
+
+                case 'MESSAGE':
+                case ArgType.MESSAGE: {
+                    const channel: GuildChannel = arg.pointer !== undefined ? parsedArgs[arg.pointer] as GuildChannel : message.channel as GuildChannel
+                    
+                    if (!channel.isText() && !channel.isThread()) return reject(RejectionType.TYPE)
+
+                    const msg = await channel.messages.fetch(current).catch(noop)
+
+                    if (!msg) return reject(RejectionType.TYPE)
+
+                    data = msg 
                     break
                 }
             }

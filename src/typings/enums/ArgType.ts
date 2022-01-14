@@ -4,5 +4,6 @@ export enum ArgType {
     CHANNEL,
     USER,
     STRING,
-    NUMBER
+    NUMBER,
+    MEMBER
 }

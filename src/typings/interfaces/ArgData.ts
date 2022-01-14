@@ -5,6 +5,7 @@ export interface ArgData {
     type: ArgTypes
     required?: boolean
     regexes?: RegExp[]
+    pointer?: number
     choices?: unknown[]
     min?: number
     max?: number
