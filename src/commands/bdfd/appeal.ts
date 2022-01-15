@@ -84,7 +84,7 @@ export default new Command<[
                 .setTitle(`Appeal Request`)
                 .addField(`User`, `[${message.author}] (${message.author!.id})`)
                 .setFooter({
-                    text: `Sent at`
+                    text: `${message.author.id} | Sent at`
                 })
                 .addField(`Punishment`, `${type} (${PunishmentType[type]})`)
                 .addField(`Reason`, reason)
