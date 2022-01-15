@@ -85,6 +85,10 @@ export class NekoClient extends Client<true> {
     get appealsGuild() {
         return this.guilds.cache.get(this.build.appeals_guild_id)!
     }
+
+    get appealsChannel() {
+        return this.mainGuild.channels.cache.get(this.build.appeals_channel_id)! as TextChannel
+    }
     
     @WrapAsyncMethodWithErrorHandler()
     async init(mode: BuildType) {

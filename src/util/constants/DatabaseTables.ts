@@ -10,5 +10,18 @@ export const DatabaseTables: DatabaseInterface = {
         nickname: new Column()
         .setName('nickname')
         .setType('TEXT')
+    },
+
+    appeals: {
+        user_id: new Column()
+        .setName('user_id')
+        .setPrimary(true)
+        .setType('TEXT'),
+        reason: new Column()
+        .setName('reason')
+        .setType('TEXT'),
+        type: new Column()
+        .setType('INTEGER')
+        .setName('type')
     }
 }

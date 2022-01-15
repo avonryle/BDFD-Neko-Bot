@@ -1,15 +1,18 @@
 import { execSync } from "child_process";
 import { Database } from "dbdts.db";
-import { ClientEvents, Collection, GuildMember } from "discord.js";
+import { ClientEvents, Collection, GuildMember, Role } from "discord.js";
 import { readdirSync } from "fs";
 import Parser from "ms-utility";
 import cast from "../functions/cast";
+import noop from "../functions/noop";
 import { CacheRecord } from "../structures/CacheRecord";
 import { Command } from "../structures/Command";
+import { PunishmentType } from "../typings/enums/PunishmentType";
 import { CacheItems } from "../typings/interfaces/CacheItems";
 import { DatabaseInterface } from "../typings/interfaces/database/DatabaseInterface";
 import { DiscordEvent } from "../typings/types/DiscordEvent";
 import DurationUnits from "../util/constants/DurationUnits";
+import { PunishmentRoles } from "../util/constants/PunishmentRoles";
 import { LogExecutionTime } from "../util/decorators/LogExecutionTime";
 import { NekoClient } from "./NekoClient";
 
@@ -30,6 +33,14 @@ export class NekoManager {
 
     constructor(client: NekoClient) {
         this.client = client
+    }
+
+    async isBanned(id: string): Promise<boolean> {
+        return Boolean(await this.client.mainGuild.bans.fetch(id).catch(noop))
+    }
+
+    getPunishmentRole(type: PunishmentType): Role {
+        return this.client.mainGuild.roles.cache.get(PunishmentRoles[PunishmentType[type] as keyof typeof PunishmentRoles])!
     }
 
     @LogExecutionTime()

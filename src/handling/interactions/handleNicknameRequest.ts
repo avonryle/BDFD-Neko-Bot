@@ -56,7 +56,7 @@ export default createInteractionHandler("button", async function(i) {
                 ]
             })
         }
-
+        
         this.db.delete('nicknames', {
             where: {
                 column: 'user_id',

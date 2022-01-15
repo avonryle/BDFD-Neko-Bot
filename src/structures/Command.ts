@@ -69,7 +69,7 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
         const {
             flags,
             args: capturedArgs
-        } = capture(rawArgs.join(' '), command.data.capturing ?? false)
+        } = capture(rawArgs.join(' '), command.data.capturing ?? true)
 
         const extras: ExtrasData<typeof flags> = {
             flags,
@@ -124,6 +124,14 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
                     if (!range) return reject(RejectionType.RANGE)
 
                     if (!matches(current, arg.regexes)) return reject(RejectionType.REGEX)
+
+                    if (arg.choices?.length) {
+                        const choice = arg.choices.find(c => c.name.toLowerCase() === current.toLowerCase())
+
+                        if (!choice) return reject(RejectionType.CHOICE)
+
+                        data = choice.value
+                    }
 
                     break
                 }
@@ -293,6 +301,12 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
         embed.addField(`Given`, input || 'None')
         .addField(`Expected`, toTitleCase(typeof arg.type === 'number' ? ArgType[arg.type] : arg.type))
         
+        if (this.data.capturing !== false) {
+            embed.setFooter({
+                text: `This command allows quoting arguments as a singleton. (f.e: 'an argument')`
+            })
+        }
+
         if (arg.min !== undefined || arg.max !== undefined) {
             const isTime = arg.type === ArgType.TIME || arg.type === 'TIME'
 
@@ -304,12 +318,16 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
         }
 
         if (arg.regexes?.length) {
-            embed.addField(`Regexes`, arg.regexes.map(c => `\`${c.source}\``).join(', '))
+            embed.addField(`Regexes`, arg.regexes.map(c => `\`${c.source}\``).join('\n'))
         }
 
         if (arg.choices?.length) {
-            embed.addField('Choices', arg.choices.map(c => `\`${c.name}\``).join(', '))
+            embed.addField('Choices', arg.choices.map(c => `\`${c.name}\``).join('\n'))
         } 
+
+        if (arg.example) {
+            embed.addField(`Example`, arg.example)
+        }
 
         if (usage.length) {
             embed.addField(`Command ${toPlural(`Usage`, usage.length)}`, `\`\`\`\n${usage.join('\n')}\`\`\``)
@@ -331,6 +349,13 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
 
     async permissionsFor(client: NekoClient, message: Message): Promise<boolean> {
         if (this.data.dmOnly && message.channel.type !== 'DM') {
+            message.channel.send({
+                embeds: [
+                    client.embed(message.member!, 'RED')
+                    .setTitle(`DM Only Command`)
+                    .setDescription(`This command cannot be used in a guild.`)
+                ]
+            })
             return false
         }
 

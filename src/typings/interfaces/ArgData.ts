@@ -9,5 +9,6 @@ export interface ArgData {
     pointer?: number
     choices?: ChoiceData[]
     min?: number
+    example?: string
     max?: number
 }
