@@ -20,4 +20,4 @@ const client = new NekoClient({
 
 client.manager.loadEvents()
 
-client.init(BuildType.TEST)
+client.init(BuildType.PUBLIC)

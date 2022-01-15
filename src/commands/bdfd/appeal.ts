@@ -41,30 +41,30 @@ export default new Command<[
                         .setDescription(`You are not banned from the main server.`)
                     ]
                 })
-            } else if (!isWarnPunishment(type)) {
-                const member = await this.mainGuild.members.fetch(message.author.id).catch(noop)
+            } 
+        } else if (!isWarnPunishment(type)) {
+            const member = await this.mainGuild.members.fetch(message.author.id).catch(noop)
 
-                if (!member) {
-                    return void message.channel.send({
-                        embeds: [
-                            this.embed(message.author!, 'RED')
-                            .setTitle(`Request Failed`)
-                            .setDescription(`You have not joined the main server.`)
-                        ]
-                    })
-                } 
+            if (!member) {
+                return void message.channel.send({
+                    embeds: [
+                        this.embed(message.author!, 'RED')
+                        .setTitle(`Request Failed`)
+                        .setDescription(`You have not joined the main server.`)
+                    ]
+                })
+            } 
 
-                const role = this.manager.getPunishmentRole(type)
+            const role = this.manager.getPunishmentRole(type)
 
-                if (!member.roles.cache.has(role.id)) {
-                    return void message.channel.send({
-                        embeds: [
-                            this.embed(message.author!, 'RED')
-                            .setTitle(`Request Failed`)
-                            .setDescription(`You do not have this punishment role.`)
-                        ]
-                    })
-                }
+            if (!member.roles.cache.has(role.id)) {
+                return void message.channel.send({
+                    embeds: [
+                        this.embed(message.author!, 'RED')
+                        .setTitle(`Request Failed`)
+                        .setDescription(`You do not have this punishment role.`)
+                    ]
+                })
             }
         }
 

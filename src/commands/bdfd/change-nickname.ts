@@ -6,7 +6,8 @@ export default new Command<[string]>({
     capturing: false,
     description: 'creates a request to change your nickname.',
     aliases: [
-        "change-nick"
+        "change-nick",
+        'nickname'
     ],
     args: [
         {
