@@ -76,7 +76,7 @@ export class Giveaway {
                 .setFooter({
                     text: `Started at`
                 })
-                .setDescription(`**Hosted By**: <@${this.data.user_id}>\n**${toPlural(`Winner`, this.data.winner_count)}**: ${this.data.winner_count}\n**Ends<t:${Math.trunc(this.data.ends_at / 1000)}:R>**\n\nThere ${toPluralOr('is', this.data.participants.length, 'are')} ${toPluralWith('participant', this.data.participants.length)}`)
+                .setDescription(`**Hosted By**: <@${this.data.user_id}>\n**${toPlural(`Winner`, this.data.winner_count)}**: ${this.data.winner_count}\n**Ends <t:${Math.trunc(this.data.ends_at / 1000)}:R>**\n\nThere ${toPluralOr('is', this.data.participants.length, 'are')} ${toPluralWith('participant', this.data.participants.length)}`)
                 .setTitle(this.data.title)
                 .setTimestamp()
             ]
@@ -125,7 +125,7 @@ export class Giveaway {
                 .setFooter({
                     text: `Last updated at`
                 })
-                .setDescription(`**Hosted By**: <@${this.data.user_id}>\n**${toPlural(`Winner`, this.data.winner_count)}**: ${this.data.winner_count}\n**Ends<t:${Math.trunc(this.data.ends_at / 1000)}:R>**\n\nThere ${toPluralOr('is', this.data.participants.length, 'are')} ${toPluralWith('participant', this.data.participants.length)}`)
+                .setDescription(`**Hosted By**: <@${this.data.user_id}>\n**${toPlural(`Winner`, this.data.winner_count)}**: ${this.data.winner_count}\n**Ends <t:${Math.trunc(this.data.ends_at / 1000)}:R>**\n\nThere ${toPluralOr('is', this.data.participants.length, 'are')} ${toPluralWith('participant', this.data.participants.length)}`)
                 .setTitle(this.data.title)
                 .setTimestamp()
             ]
@@ -285,7 +285,7 @@ export class Giveaway {
                 .setFooter({
                     text: `Thanks for participating!`
                 })
-                .setDescription(`**Hosted By**: <@${this.data.user_id}>\n**${toPlural(`Winner`, this.data.winner_count)}**: ${winners.join(', ') || 'Nobody'}\n**Ended<t:${Math.trunc(this.data.ends_at / 1000)}:R>**\n\nThere ${toPluralOr('was', this.data.participants.length, 'were')} ${toPluralWith('participant', this.data.participants.length)}`)
+                .setDescription(`**Hosted By**: <@${this.data.user_id}>\n**${toPlural(`Winner`, this.data.winner_count)}**: ${winners.join(', ') || 'Nobody'}\n**Ended <t:${Math.trunc(this.data.ends_at / 1000)}:R>**\n\nThere ${toPluralOr('was', this.data.participants.length, 'were')} ${toPluralWith('participant', this.data.participants.length)}`)
                 .setTitle(this.data.title)
             ]
         })
