@@ -5,5 +5,6 @@ export enum ArgType {
     USER,
     STRING,
     NUMBER,
-    MEMBER
+    MEMBER,
+    TARGET
 }

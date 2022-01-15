@@ -7,6 +7,7 @@ import cleanID from "../functions/cleanID";
 import createSelector from "../functions/createSelector";
 import fetchMember from "../functions/fetchMember";
 import inRange from "../functions/inRange";
+import isDiscordID from "../functions/isDiscordID";
 import matches from "../functions/matches";
 import noop from "../functions/noop";
 import removeScripts from "../functions/removeScripts";
@@ -55,7 +56,7 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
         const command = client.manager.commands.get(cmd) ?? client.manager.commands.find(
             c => c.data.name === cmd || removeScripts(c.data.name) === removeScripts(cmd) || (
                 c.data.aliases ? c.data.aliases.some(
-                    alias => alias === cmd || removeScripts(alias) === removeScripts(alias)
+                    alias => alias === cmd || removeScripts(alias) === removeScripts(cmd)
                 ) : false
             )
         )
@@ -134,6 +135,22 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
                     }
 
                     break
+                }
+
+                case 'TARGET':;
+                case ArgType.TARGET: {
+                    const got = isDiscordID(current) ? await client.users.fetch(current).catch(noop) : await fetchMember(message.guild!, current)
+
+                    const selected = await createSelector(
+                        message,
+                        got ?? null
+                    )
+
+                    if (selected === undefined) return reject(RejectionType.TYPE)
+
+                    if (selected === null) return false;
+
+                    data = selected
                 }
 
                 case 'NUMBER':
