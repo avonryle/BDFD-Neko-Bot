@@ -45,6 +45,8 @@ export default createInteractionHandler('button', async function(i) {
             })
         }
 
+        collected?.react('✅').catch(noop)
+
         const dm = await this.users.createDM(id).catch(noop)
 
         this.db.delete("appeals", {
