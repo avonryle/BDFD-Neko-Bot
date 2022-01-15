@@ -1,8 +1,10 @@
-import { Client, ClientOptions, User } from "discord.js";
+import { Client, ClientOptions, ColorResolvable, GuildMember, MessageEmbed, TextChannel, User } from "discord.js";
 import { BuildType } from "../typings/enums/BuildType";
 import config from "../config.json"
 import { WrapAsyncMethodWithErrorHandler } from "../util/decorators/WrapMethodWithErrorHandler";
 import { NekoManager } from "./NekoManager";
+import { DatabaseTables } from "../util/constants/DatabaseTables";
+import { Column } from "dbdts.db";
 
 export class NekoClient extends Client<true> {
     #mode!: BuildType
@@ -42,12 +44,38 @@ export class NekoClient extends Client<true> {
         }
     }
 
+    embed(user: User | GuildMember, color: ColorResolvable): MessageEmbed {
+        return new MessageEmbed()
+        .setAuthor({
+            name: user instanceof User ? user.tag : user.user.tag,
+            iconURL: user.displayAvatarURL({ dynamic: true })
+        })
+        .setColor(color)
+        .setTimestamp()
+    }
+
+    get db() {
+        return this.manager.db
+    }
+
     get build() {
         return this.config[this.#mode]
     }
 
     get config() {
         return config
+    }
+
+    get changeNicknameChannel() {
+        return this.mainGuild.channels.cache.get(this.build.change_nickname_channel_id)! as TextChannel
+    }
+
+    get changeNicknameLogChannel() {
+        return this.mainGuild.channels.cache.get(this.build.change_nickname_log_channel_id)! as TextChannel
+    }
+
+    get changeNicknameRole() {
+        return this.mainGuild.roles.cache.get(this.build.change_nickname_role)!
     }
 
     get mainGuild() {
@@ -62,6 +90,16 @@ export class NekoClient extends Client<true> {
     async init(mode: BuildType) {
         this.#mode = mode
 
-        await this.login(this.build.token)
+        for (const [ table, columns ] of Object.entries(DatabaseTables)) {
+            const got = Object.values<Column>(columns)
+            this.db.createTable(table).addColumns(got)
+        }
+
+        this.db.once("ready", () => {
+            console.log(`Database ready`)
+            this.login(this.build.token)
+        })
+
+        this.db.connect()
     }
 }

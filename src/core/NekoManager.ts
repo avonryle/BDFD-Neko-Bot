@@ -1,11 +1,13 @@
 import { execSync } from "child_process";
-import { ClientEvents, Collection } from "discord.js";
+import { Database } from "dbdts.db";
+import { ClientEvents, Collection, GuildMember } from "discord.js";
 import { readdirSync } from "fs";
 import Parser from "ms-utility";
 import cast from "../functions/cast";
 import { CacheRecord } from "../structures/CacheRecord";
 import { Command } from "../structures/Command";
 import { CacheItems } from "../typings/interfaces/CacheItems";
+import { DatabaseInterface } from "../typings/interfaces/database/DatabaseInterface";
 import { DiscordEvent } from "../typings/types/DiscordEvent";
 import DurationUnits from "../util/constants/DurationUnits";
 import { LogExecutionTime } from "../util/decorators/LogExecutionTime";
@@ -17,6 +19,12 @@ export class NekoManager {
     cache = new CacheRecord<CacheItems>()
     parser = new Parser(DurationUnits)
     
+    db = new Database({
+        path: './neko.db',
+        sanitize: true,
+        length: 10
+    })
+
     commands = new Collection<string, Command>()
     events = new Collection<keyof ClientEvents, DiscordEvent>()
 
