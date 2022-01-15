@@ -24,7 +24,7 @@ export default new Command<[
             .setTitle(`Here's ${user.username}'s global avatar`)
             .setTimestamp()
             .setImage(
-                user.displayAvatarURL({ dynamic: true })
+                user.displayAvatarURL({ dynamic: true, size: 2048 })
             )
         )
 
@@ -34,7 +34,7 @@ export default new Command<[
                 .setTitle(`Here's ${user.username}'s server avatar`)
                 .setTimestamp()
                 .setImage(
-                    member.displayAvatarURL({ dynamic: true })
+                    member.displayAvatarURL({ dynamic: true, size: 2048 })
                 )
             )
         }

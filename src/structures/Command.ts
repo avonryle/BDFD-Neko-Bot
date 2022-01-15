@@ -20,6 +20,7 @@ import { CommandData } from "../typings/interfaces/CommandData";
 import { ExtrasData } from "../typings/interfaces/ExtrasData";
 import { Async } from "../typings/types/Async";
 import { RejectionTypes } from "../typings/types/RejectionTypes";
+import StaffRoles from "../util/constants/StaffRoles";
 import { AsyncLogExecutionTime } from "../util/decorators/LogExecutionTime";
 import { WrapAsyncMethodWithErrorHandler } from "../util/decorators/WrapMethodWithErrorHandler";
 
@@ -151,6 +152,7 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
                     if (selected === null) return false;
 
                     data = selected
+                    break
                 }
 
                 case 'NUMBER':
@@ -378,6 +380,35 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
 
         if (this.data.owner && !(await client.fetchOwners()).includes(message.author.id)) {
             
+            return false
+        }
+        
+        if (this.data.moderator && !message.member?.roles.cache.has(StaffRoles.MODERATOR)) {
+            message.channel.send({
+                embeds: [
+                    client.embed(message.member!, 'RED')
+                    .setTitle(`Missing Permissions`)
+                    .setDescription(`Only moderators can use this command.`)
+                ]
+            })
+            return false
+        } else if (this.data.staff && !message.member?.roles.cache.has(StaffRoles.STAFF)) {
+            message.channel.send({
+                embeds: [
+                    client.embed(message.member!, 'RED')
+                    .setTitle(`Missing Permissions`)
+                    .setDescription(`Only staff can use this command.`)
+                ]
+            })
+            return false
+        } else if (this.data.leadStaff && !message.member?.roles.cache.has(StaffRoles.LEAD_STAFF)) {
+            message.channel.send({
+                embeds: [
+                    client.embed(message.member!, 'RED')
+                    .setTitle(`Missing Permissions`)
+                    .setDescription(`Only lead staff can use this command.`)
+                ]
+            })
             return false
         }
 
