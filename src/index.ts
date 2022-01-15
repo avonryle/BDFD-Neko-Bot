@@ -15,9 +15,18 @@ const client = new NekoClient({
         "DIRECT_MESSAGES",
         "GUILDS",
         "GUILD_MESSAGES"
-    ]
+    ],
+    presence: {
+        status: 'idle',
+        activities: [
+            {
+                name: 'use me for their needs',
+                type: 'WATCHING'
+            }
+        ]
+    }
 })
 
 client.manager.loadEvents()
 
-client.init(BuildType.PUBLIC)
+client.init(BuildType.TEST)

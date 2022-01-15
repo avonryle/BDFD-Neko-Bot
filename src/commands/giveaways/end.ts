@@ -1,5 +1,6 @@
 import noop from "../../functions/noop";
 import { Command } from "../../structures/Command";
+import StaffRoles from "../../util/constants/StaffRoles";
 
 export default new Command<[
     string
@@ -12,6 +13,10 @@ export default new Command<[
             type: 'STRING',
             required: true 
         }
+    ],
+    roles: [
+        StaffRoles.MODERATOR,
+        StaffRoles.LEAD_STAFF
     ],
     execute: async function(message, [ id ]) {
         const gw = this.manager.giveaways.get(id)
