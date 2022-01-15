@@ -2,6 +2,7 @@ import { MessageEmbed } from "discord.js";
 import awaitMessage from "../../functions/awaitMessage";
 import createInteractionHandler from "../../functions/createInteractionHandler";
 import isBanPunishment from "../../functions/isBanPunishment";
+import isHigherUp from "../../functions/isHigherUp";
 import isStaff from "../../functions/isStaff";
 import isWarnPunishment from "../../functions/isWarnPunishment";
 import noop from "../../functions/noop";
@@ -10,7 +11,7 @@ import { PunishmentType } from "../../typings/enums/PunishmentType";
 export default createInteractionHandler('button', async function(i) {
     if (!i.customId.includes(`appeal`)) return; 
 
-    if (!isStaff(i.member)) {
+    if (!isHigherUp(i.member)) {
         return i.reply({
             ephemeral: true,
             content: `You cannot use this button.`
