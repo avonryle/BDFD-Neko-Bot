@@ -1,5 +1,6 @@
 import { GuildTextBasedChannel, Message, TextBasedChannel } from "discord.js";
 import { Option } from "../typings/types/Option";
+import deleteAfter from "./deleteAfter";
 import noop from "./noop";
 
 export default async function(
@@ -8,7 +9,7 @@ export default async function(
     text: string, 
     time = 30_000
 ): Promise<Option<Message | undefined>> {
-    await channel.send({
+    const msg = await channel.send({
         content: `${text}\nYou have ${time / 1000} seconds to reply.\nType \`cancel\` to cancel the operation.`,
         allowedMentions: {
             users: [],
@@ -24,15 +25,17 @@ export default async function(
     })
     .catch(noop)
 
+    msg.delete().catch(noop)
+    
     if (!collected) {
-        channel.send(`You did not reply in time, operation cancelled.`)
+        channel.send(`You did not reply in time, operation cancelled.`).then(deleteAfter).catch(noop)
         return null
     }
 
     const m = collected.first()!
 
     if (m.content.toLowerCase() === 'cancel') {
-        channel.send(`Operation has been cancelled.`)
+        channel.send(`Operation has been cancelled.`).then(deleteAfter).catch(noop)
         return undefined
     }
 
