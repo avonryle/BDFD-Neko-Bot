@@ -10,11 +10,7 @@ export default async function(
     time = 30_000
 ): Promise<Option<Message | undefined>> {
     const msg = await channel.send({
-        content: `${text}\nYou have ${time / 1000} seconds to reply.\nType \`cancel\` to cancel the operation.`,
-        allowedMentions: {
-            users: [],
-            roles: []
-        }
+        content: `${text}\nYou have ${time / 1000} seconds to reply.\nType \`cancel\` to cancel the operation.`
     })
 
     const collected = await channel.awaitMessages({
@@ -26,7 +22,7 @@ export default async function(
     .catch(noop)
 
     msg.delete().catch(noop)
-    
+
     if (!collected) {
         channel.send(`You did not reply in time, operation cancelled.`).then(deleteAfter).catch(noop)
         return null
