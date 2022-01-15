@@ -2,6 +2,14 @@ import { TimeUnit } from "ms-utility/dist/typings/interfaces/TimeUnit";
 
 export default [
     [
+        'w',
+        {
+            letter: 'w',
+            word: 'week',
+            ms: 86_400_000 * 7
+        }
+    ],
+    [
         "d",
         {
             letter: 'd',

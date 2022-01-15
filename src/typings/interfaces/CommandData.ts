@@ -7,12 +7,10 @@ export interface CommandData<T = unknown[], K extends ParsedContentData["flags"]
     description: string
     category?: string
     capturing?: boolean
-    staff?: boolean
     dmOnly?: boolean
     aliases?: string[]
+    roles?: string[]
     owner?: boolean
-    moderator?: boolean
-    leadStaff?: boolean
     args?: Arg[]
     execute: Executor<T, K>
 }

@@ -11,7 +11,11 @@ const client = new NekoClient({
         "REACTION",
         "USER"
     ],
-    intents: Object.values(Intents.FLAGS)
+    intents: [
+        "DIRECT_MESSAGES",
+        "GUILDS",
+        "GUILD_MESSAGES"
+    ]
 })
 
 client.manager.loadEvents()

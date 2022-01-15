@@ -74,6 +74,10 @@ export class NekoClient extends Client<true> {
         return this.mainGuild.channels.cache.get(this.build.change_nickname_log_channel_id)! as TextChannel
     }
 
+    get altLogChannel() {
+        return this.mainGuild.channels.cache.get(this.build.alt_channel_log_id)! as TextChannel
+    }
+
     get changeNicknameRole() {
         return this.mainGuild.roles.cache.get(this.build.change_nickname_role)!
     }

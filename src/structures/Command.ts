@@ -1,5 +1,5 @@
 import { capture, ParsedContentData } from "arg-capturer";
-import { GuildChannel, Message, MessageEmbed } from "discord.js";
+import { GuildChannel, Interaction, Message, MessageEmbed, User } from "discord.js";
 import { type } from "os";
 import { NekoClient } from "../core/NekoClient";
 import cast from "../functions/cast";
@@ -173,7 +173,8 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
                 case ArgType.TIME: {
                     try {
                         const time = client.manager.parser.advancedParseToMS(current)
-                        if (inRange(time, arg.min, arg.max)) return reject(RejectionType.RANGE)
+   
+                        if (!inRange(time, arg.min, arg.max)) return reject(RejectionType.RANGE)
 
                         data = time 
                         break
@@ -366,9 +367,12 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
         return false
     }
 
-    async permissionsFor(client: NekoClient, message: Message): Promise<boolean> {
-        if (this.data.dmOnly && message.channel.type !== 'DM') {
-            message.channel.send({
+    async permissionsFor(client: NekoClient, message: Message | Interaction<'cached'>, send = true): Promise<boolean> {
+        const channel = message instanceof Message ? message.channel! : message.channel!
+        const user = message instanceof Message ? message.author : message.user
+
+        if (this.data.dmOnly && channel.type !== 'DM') {
+            if (send) channel.send({
                 embeds: [
                     client.embed(message.member!, 'RED')
                     .setTitle(`DM Only Command`)
@@ -378,35 +382,17 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
             return false
         }
 
-        if (this.data.owner && !(await client.fetchOwners()).includes(message.author.id)) {
+        if (this.data.owner && !(await client.fetchOwners()).includes(user.id)) {
             
             return false
         }
-        
-        if (this.data.moderator && !message.member?.roles.cache.has(StaffRoles.MODERATOR)) {
-            message.channel.send({
+
+        if (this.data.roles?.length && !this.data.roles.some(c => message.member?.roles.cache.has(c))) {
+            if (send) channel.send({
                 embeds: [
                     client.embed(message.member!, 'RED')
                     .setTitle(`Missing Permissions`)
-                    .setDescription(`Only moderators can use this command.`)
-                ]
-            })
-            return false
-        } else if (this.data.staff && !message.member?.roles.cache.has(StaffRoles.STAFF)) {
-            message.channel.send({
-                embeds: [
-                    client.embed(message.member!, 'RED')
-                    .setTitle(`Missing Permissions`)
-                    .setDescription(`Only staff can use this command.`)
-                ]
-            })
-            return false
-        } else if (this.data.leadStaff && !message.member?.roles.cache.has(StaffRoles.LEAD_STAFF)) {
-            message.channel.send({
-                embeds: [
-                    client.embed(message.member!, 'RED')
-                    .setTitle(`Missing Permissions`)
-                    .setDescription(`Only lead staff can use this command.`)
+                    .setDescription(`You must have one of these roles: ${this.data.roles.filter(c => message.guild?.roles.cache.has(c)).map(c => `<@&${c}>`).join(', ') || '?'} in order to run this command.`)
                 ]
             })
             return false
