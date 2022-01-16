@@ -6,5 +6,6 @@ export const SafeLinks = [
     "cdn.discordapp.com",
     "canary.discord",
     "ptb.discord",
+    'tenor.com',
     'discord.com'
 ] as const
