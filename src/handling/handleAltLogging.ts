@@ -5,9 +5,10 @@ const MINIMUM_CREATION_TIME = 86_400_000 * 3;
 
 export default function(client: NekoClient, member: GuildMember) {
     if (member.guild.id !== client.build.main_guild_id) return;
-    
+
     const creation = Date.now() - member.user.createdTimestamp
 
+    console.log(creation, MINIMUM_CREATION_TIME)
     if (creation > MINIMUM_CREATION_TIME) return;
 
     const embed = new MessageEmbed()

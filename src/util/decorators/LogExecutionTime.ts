@@ -1,6 +1,10 @@
 import chalk from "chalk"
 import { UnknownMethod } from "../../typings/types/UnknownMethod"
 
+function findCommand(...args: unknown[]) {
+    const cmd = require(`../../structures/Command`).Command
+}
+
 export function LogExecutionTime() {
     return function(target: any, property: string, descriptor: PropertyDescriptor) {
         const fn = descriptor.value! as UnknownMethod
