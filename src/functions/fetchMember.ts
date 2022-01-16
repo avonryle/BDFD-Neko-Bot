@@ -6,10 +6,8 @@ export default async function(
     guild: Guild,
     query: string
 ): Promise<null | GuildMember | Collection<string, GuildMember>> {
-    query = cleanID(query)
-
-    if (/[0-9]+/g.test(query)) {
-        return await guild.members.fetch(query).catch(noop) ?? null
+    if (/[0-9]+/g.test(cleanID(query))) {
+        return await guild.members.fetch(cleanID(query)).catch(noop) ?? null
     }
 
     const got = await guild.members.fetch({
