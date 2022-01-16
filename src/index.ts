@@ -21,7 +21,7 @@ const client = new NekoClient({
         status: 'idle',
         activities: [
             {
-                name: 'use me for their needs',
+                name: 'staff use me for their needs',
                 type: 'WATCHING'
             }
         ]
