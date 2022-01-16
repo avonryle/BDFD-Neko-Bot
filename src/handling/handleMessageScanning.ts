@@ -22,7 +22,7 @@ export default async function(client: NekoClient, message: Message) {
 
     message.delete().catch(noop)
 
-    message.reply(`:x: Do not send scam links here!`).catch(noop)
+    message.channel.send(`:x: ${message.author} do not send scam links here!`).catch(noop)
 
     const channel = message.guild.channels.cache.get(settings.scam_links_log_channel_id!)
 
