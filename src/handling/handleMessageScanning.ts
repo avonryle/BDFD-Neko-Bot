@@ -66,8 +66,6 @@ export default async function(client: NekoClient, message: Message) {
             break
         };
 
-        console.log(review.data)
-
         const data: ScamLinkData = {
             is_scam: isScamLink(review.data),
             url: domain
