@@ -8,7 +8,6 @@ export default function(client: NekoClient, member: GuildMember) {
 
     const creation = Date.now() - member.user.createdTimestamp
 
-    console.log(creation, MINIMUM_CREATION_TIME)
     if (creation > MINIMUM_CREATION_TIME) return;
 
     const embed = new MessageEmbed()
