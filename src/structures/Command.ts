@@ -261,7 +261,7 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
         return parsedArgs as unknown as T 
     }
 
-    async usage(client: NekoClient, message: Message, extras: ExtrasData<K>): Promise<string[]> {
+    async usage(client: NekoClient, message: Message, extras?: ExtrasData<K>): Promise<string[]> {
         if (!this.data.args?.length) return []
 
         const args = new Array<ArgData>()
@@ -278,14 +278,17 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
             }
         }
 
+        const prefix = client.prefixes[0]
+        const commandString = this.data.name
+
         if (x === -1) {
             return [
-                `${extras.prefix}${extras.commandString} ${args.map(c => `<${c.name}>`).join(' ')}`
+                `${extras?.prefix ?? prefix}${extras?.commandString ?? commandString} ${args.map(c => `<${c.name}>`).join(' ')}`
             ]
         }
 
         const parsed = new Array<string>(
-            `${extras.prefix}${extras.commandString} ${args.slice(0, x).map(c => `<${c.name}>`).join(' ')}`
+            `${extras?.prefix ?? prefix}${extras?.commandString ?? commandString} ${args.slice(0, x).map(c => `<${c.name}>`).join(' ')}`
         )
 
         const optional = args.slice(x)
@@ -293,7 +296,7 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
         for (let i = 0, len = optional.length;i < len;i++) {
             const total = args.slice(0, i + x)
 
-            parsed.push(`${extras.prefix}${extras.commandString} ${args.map(c => c.required ? `<${c.name}>` : `[${c.name}]`).join(' ')}`)
+            parsed.push(`${extras?.prefix ?? prefix}${extras?.commandString ?? commandString} ${args.map(c => c.required ? `<${c.name}>` : `[${c.name}]`).join(' ')}`)
         }
 
         return parsed 

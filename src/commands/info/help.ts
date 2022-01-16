@@ -57,7 +57,7 @@ export default new Command<[
             if (command.data.roles?.length) embed.addField(`Allowed Roles`, command.data.roles.map(c => `<@&${c}>`).join(', '), true)
 
             if (command.data.args?.length) {
-                const usages = await command.usage(this, message, extras)
+                const usages = await command.usage(this, message)
                 embed.addField(`Command ${toPlural('Usage', usages.length)}`, `\`\`\`\n${usages.join('\n')}\`\`\``, true)
             }
 
