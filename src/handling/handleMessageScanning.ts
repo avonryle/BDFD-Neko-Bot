@@ -28,16 +28,20 @@ export default async function(client: NekoClient, message: Message) {
 
     if (!channel || channel.isVoice() || channel.isThread() || !channel.isText()) return;
 
+    const embed = client.embed(message.member!, 'RED')
+    .setTitle(`Suspicious Message`)
+    .setDescription(message.content)
+    .addField(`Severity`, `${review.data.result} (${ScamLinkType[review.data.result]})`)
+    .addField(`Found at`, `#${message.channel.name} [${message.channel}]`)
+    .setFooter({
+        text: message.author.id
+    })
+
+    if (review.data.linkFound) embed.addField(`Scam Link`, review.data.linkFound)
+
     channel.send({
         embeds: [
-            client.embed(message.member!, 'RED')
-            .setTitle(`Suspicious Message`)
-            .setDescription(message.content)
-            .addField(`Severity`, `${review.data.result} (${ScamLinkType[review.data.result]})`)
-            .addField(`Found at`, `#${message.channel.name} [${message.channel}]`)
-            .setFooter({
-                text: message.author.id
-            })
+            embed 
         ]
     })
     .catch(noop)
