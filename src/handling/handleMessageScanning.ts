@@ -1,14 +1,16 @@
 import axios from "axios";
+import chalk from "chalk";
 import { Message } from "discord.js";
 import { NekoClient } from "../core/NekoClient";
+import cast from "../functions/cast";
+import extractLinks from "../functions/extractLinks";
+import isScamLink from "../functions/isScamLink";
 import noop from "../functions/noop";
-import { ScamLinkType } from "../typings/enums/http/ScamLinkType";
-import { ScamLinkRequest } from "../typings/interfaces/http/ScamLinkRequest";
+import { ScamLinkData } from "../typings/interfaces/database/ScamLinkData";
+import { ScanRequest } from "../typings/interfaces/http/ScanRequest";
 
 export default async function(client: NekoClient, message: Message) {
     if (message.channel.type === 'DM' || !message.guild) return;
-
-    if (message.member?.permissions.has('ADMINISTRATOR')) return;
 
     if (message.author.bot) return;
 
@@ -16,31 +18,91 @@ export default async function(client: NekoClient, message: Message) {
 
     if (!settings.detect_scam_links) return;
 
-    const review = await axios.get<ScamLinkRequest>(`https://spen.tk/api/scams/isScam?q=${encodeURIComponent(message.content)}`).catch(noop)
+    const links = extractLinks(message.content)
 
-    if (!review || !review.data?.result) return;
+    if (!links.length) return;
 
-    message.delete().catch(noop)
+    for (let i = 0, len = links.length;i < len;i++) {
+        const {
+            domain,
+            url
+        } = links[i]
 
-    const channel = message.guild.channels.cache.get(settings.scam_links_log_channel_id!)
+        const existing = client.manager.scamLink(domain)
+        
+        if (existing) {
+            if (!existing.is_scam) {
+                continue
+            } else {
+                console.log(`${chalk.red.bold(`[SCAM DOMAIN]`)} => Identified an already existing scam domain: ${chalk.yellow.bold(domain)}.`)
+                
+                message.delete().catch(noop)
 
-    if (!channel || channel.isVoice() || channel.isThread() || !channel.isText()) return;
+                const channel = message.guild.channels.cache.get(settings.scam_links_log_channel_id!)
+    
+                if (!channel || channel.isVoice() || channel.isThread() || !channel.isText()) return;
 
-    const embed = client.embed(message.member!, 'RED')
-    .setTitle(`Suspicious Message`)
-    .setDescription(message.content)
-    .addField(`Severity`, `${review.data.result} (${ScamLinkType[review.data.result]})`)
-    .addField(`Found at`, `#${message.channel.name} [${message.channel}]`)
-    .setFooter({
-        text: message.author.id
-    })
+                const embed = client.embed(message.member!, 'RED')
+                .setTitle(`Suspicious Message`)
+                .setDescription(message.content)
+                .addField(`Found at`, `#${message.channel.name} [${message.channel}]`)
+                .setFooter({
+                    text: message.author.id
+                })
+                .addField(`Scam Link`, url)
+            
+                return void channel.send({
+                    embeds: [
+                        embed 
+                    ]
+                })
+                .catch(noop)
+            }
+        }
 
-    if (review.data.linkFound) embed.addField(`Scam Link`, review.data.linkFound)
+        const review = await axios.get<ScanRequest>(`https://ipqualityscore.com/api/json/url/${client.config.keys[0]}/${encodeURIComponent(url)}`).catch(noop)
 
-    channel.send({
-        embeds: [
-            embed 
-        ]
-    })
-    .catch(noop)
+        if (!review || !review.data) {
+            break
+        };
+
+        const data: ScamLinkData = {
+            is_scam: isScamLink(review.data),
+            domain
+        }
+    
+        client.manager.scamLinks.set(data.domain, data)
+        client.db.upsert("links", cast(data), {
+            column: 'url',
+            equals: domain
+        })
+
+        if (!data.is_scam) {
+            continue
+        }
+        
+        console.log(`${chalk.red.bold(`[SCAM DOMAIN]`)} => Identified new scam domain: ${chalk.yellow.bold(domain)}.`)
+
+        message.delete().catch(noop)
+    
+        const channel = message.guild.channels.cache.get(settings.scam_links_log_channel_id!)
+    
+        if (!channel || channel.isVoice() || channel.isThread() || !channel.isText()) return;
+    
+        const embed = client.embed(message.member!, 'RED')
+        .setTitle(`Suspicious Message`)
+        .setDescription(message.content)
+        .addField(`Found at`, `#${message.channel.name} [${message.channel}]`)
+        .setFooter({
+            text: message.author.id
+        })
+        .addField(`Scam Link`, url)
+    
+        channel.send({
+            embeds: [
+                embed 
+            ]
+        })
+        .catch(noop)
+    }
 }

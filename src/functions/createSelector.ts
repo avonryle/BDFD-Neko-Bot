@@ -25,6 +25,8 @@ export default async function<
 
     if (!arr.length) return undefined
 
+    if (arr.length === 1) return arr[0]
+    
     const embeds = new Array<MessageEmbed>()
 
     const menu = new MessageSelectMenu()
