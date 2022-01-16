@@ -1,6 +1,12 @@
 import { LinkExtractorResult } from "../typings/interfaces/LinkExtratorResult"
 import { SafeLinks } from "../util/constants/SafeLinks"
 
+const HTTP: string[] = [
+    "www.",
+    "https://",
+    "http://"
+]
+
 const regex = /(https?:\/\/)?(www\.)?([-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4})\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
 
 export default function(content: string): LinkExtractorResult[] {
@@ -16,6 +22,10 @@ export default function(content: string): LinkExtractorResult[] {
             url: it[0]
         }
 
+        if (!HTTP.some(c => d.url.startsWith(c))) {
+            continue
+        }
+        
         if (SafeLinks.some(c => d.domain === c)) {
             continue
         }
