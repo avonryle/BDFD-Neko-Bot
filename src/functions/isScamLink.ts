@@ -5,6 +5,7 @@ export default function(data: ScanRequest): boolean {
         data.phishing || data.suspicious
     ) && (
         data.domain_age.iso !== null &&
-        data.domain_age.timestamp !== null
+        data.domain_age.timestamp !== null &&
+        data.risk_score > 50
     )
 }
