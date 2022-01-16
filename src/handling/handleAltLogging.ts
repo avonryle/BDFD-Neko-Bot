@@ -4,6 +4,8 @@ import { NekoClient } from "../core/NekoClient";
 const MINIMUM_CREATION_TIME = 86_400_000 * 3;
 
 export default function(client: NekoClient, member: GuildMember) {
+    if (member.guild.id !== client.build.main_guild_id) return;
+    
     const creation = Date.now() - member.user.createdTimestamp
 
     if (creation > MINIMUM_CREATION_TIME) return;
