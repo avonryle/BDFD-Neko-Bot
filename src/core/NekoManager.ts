@@ -55,8 +55,8 @@ export class NekoManager {
         const existing = this.scamLinks.get(url)
         if (existing) return existing
         const data = this.db.get("links", url) as unknown as ScamLinkData
-        if (!data.domain) return null
-        this.scamLinks.set(data.domain, data)
+        if (!data.url) return null
+        this.scamLinks.set(data.url, data)
         return data
     }
 

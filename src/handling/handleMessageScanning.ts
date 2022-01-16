@@ -66,12 +66,14 @@ export default async function(client: NekoClient, message: Message) {
             break
         };
 
+        console.log(review.data)
+
         const data: ScamLinkData = {
             is_scam: isScamLink(review.data),
-            domain
+            url: domain
         }
     
-        client.manager.scamLinks.set(data.domain, data)
+        client.manager.scamLinks.set(data.url, data)
         client.db.upsert("links", cast(data), {
             column: 'url',
             equals: domain

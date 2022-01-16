@@ -52,7 +52,7 @@ export const DatabaseTables: DatabaseInterface = {
     },
 
     links: {
-        domain: new Column()
+        url: new Column()
         .setName('url')
         .setPrimary(true)
         .setType('TEXT'),
