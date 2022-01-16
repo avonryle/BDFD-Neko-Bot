@@ -11,6 +11,7 @@ import { Giveaway } from "../structures/Giveaway";
 import { PunishmentType } from "../typings/enums/PunishmentType";
 import { CacheItems } from "../typings/interfaces/CacheItems";
 import { DatabaseInterface } from "../typings/interfaces/database/DatabaseInterface";
+import { GuildSettingsData } from "../typings/interfaces/database/GuildSettingsData";
 import { DiscordEvent } from "../typings/types/DiscordEvent";
 import DurationUnits from "../util/constants/DurationUnits";
 import { PunishmentRoles } from "../util/constants/PunishmentRoles";
@@ -19,6 +20,8 @@ import { NekoClient } from "./NekoClient";
 
 export class NekoManager {
     client: NekoClient
+
+    settings = new Collection<string, GuildSettingsData>()
 
     cache = new CacheRecord<CacheItems>()
     parser = new Parser(DurationUnits)
@@ -46,6 +49,20 @@ export class NekoManager {
 
     getPunishmentRole(type: PunishmentType): Role {
         return this.client.mainGuild.roles.cache.get(PunishmentRoles[PunishmentType[type] as keyof typeof PunishmentRoles])!
+    }
+
+    guildSettings(id: string) {
+        const existing = this.settings.get(id)
+        
+        if (existing) return existing
+
+        const settings = this.db.get('guilds', id) as unknown as GuildSettingsData
+
+        settings.guild_id = id
+
+        this.settings.set(settings.guild_id, settings)
+
+        return settings
     }
 
     @LogExecutionTime()

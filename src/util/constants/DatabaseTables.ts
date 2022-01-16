@@ -51,6 +51,22 @@ export const DatabaseTables: DatabaseInterface = {
         .setType('INTEGER')
     },
 
+    guilds: {
+        guild_id: new Column()
+        .setName('guild_id')
+        .setType('TEXT')
+        .setPrimary(true),
+
+        scam_links_log_channel_id: new Column()
+        .setName('scam_links_log_channel_id')
+        .setType('TEXT'),
+
+        detect_scam_links: new Column()
+        .setName('detect_scam_links')
+        .setDefault(false)
+        .setType('BOOLEAN')
+    },
+
     appeals: {
         user_id: new Column()
         .setName('user_id')

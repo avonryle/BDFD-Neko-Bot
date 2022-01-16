@@ -12,6 +12,7 @@ import isDiscordID from "../functions/isDiscordID";
 import matches from "../functions/matches";
 import noop from "../functions/noop";
 import removeScripts from "../functions/removeScripts";
+import snakeToTitle from "../functions/snakeToTitle";
 import { toPlural } from "../functions/toPlural";
 import toTitleCase from "../functions/toTitleCase";
 import { ArgType } from "../typings/enums/ArgType";
@@ -126,6 +127,11 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
 
             let data: unknown = current
 
+            if (arg.allow?.length && arg.allow.some(c => c === current)) {
+                parsedArgs.push(null)
+                continue
+            }
+            
             switch(arg.type) {
                 case 'STRING':
                 case ArgType.STRING: {
@@ -397,6 +403,22 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
             
             return false
         }
+
+        if (this.data.permissions?.length && !message.member?.permissions.has(this.data.permissions)) {
+            if (send) {
+                const missing = this.data.permissions.filter(c => !message.member!.permissions.has(c)).map(snakeToTitle)
+
+                channel.send({
+                    embeds: [
+                        client.embed(message.member!, 'RED')
+                        .setTitle(`Missing Permissions`)
+                        .setDescription(`You're missing the next permissions to use this command: ${missing.map(c => `\`${c}\``).join(', ')}.`)
+                    ]
+                })
+            }
+            return false
+        }
+
 
         if (this.data.roles?.length && !this.data.roles.some(c => message.member?.roles.cache.has(c))) {
             if (send) channel.send({

@@ -8,6 +8,7 @@ export interface ArgData {
     regexes?: RegExp[]
     pointer?: number
     choices?: ChoiceData[]
+    allow?: string[]
     min?: number
     example?: string
     max?: number

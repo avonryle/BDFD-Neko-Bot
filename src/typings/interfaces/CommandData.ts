@@ -1,4 +1,5 @@
 import { ParsedContentData } from "arg-capturer"
+import { PermissionString } from "discord.js"
 import { Arg } from "../types/Arg"
 import { Executor } from "../types/Executor"
 
@@ -11,6 +12,7 @@ export interface CommandData<T = unknown[], K extends ParsedContentData["flags"]
     aliases?: string[]
     roles?: string[]
     owner?: boolean
+    permissions?: PermissionString[]
     args?: Arg[]
     execute: Executor<T, K>
 }
