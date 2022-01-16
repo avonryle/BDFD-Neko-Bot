@@ -12,7 +12,6 @@ import { PunishmentType } from "../typings/enums/PunishmentType";
 import { CacheItems } from "../typings/interfaces/CacheItems";
 import { DatabaseInterface } from "../typings/interfaces/database/DatabaseInterface";
 import { GuildSettingsData } from "../typings/interfaces/database/GuildSettingsData";
-import { ScamLinkData } from "../typings/interfaces/database/ScamLinkData";
 import { DiscordEvent } from "../typings/types/DiscordEvent";
 import { Option } from "../typings/types/Option";
 import DurationUnits from "../util/constants/DurationUnits";
@@ -24,8 +23,6 @@ export class NekoManager {
     client: NekoClient
 
     settings = new Collection<string, GuildSettingsData>()
-
-    scamLinks = new Collection<string, ScamLinkData>()
 
     cache = new CacheRecord<CacheItems>()
     parser = new Parser(DurationUnits)
@@ -49,15 +46,6 @@ export class NekoManager {
 
     async isBanned(id: string): Promise<boolean> {
         return Boolean(await this.client.mainGuild.bans.fetch(id).catch(noop))
-    }
-
-    scamLink(url: string): Option<ScamLinkData> {
-        const existing = this.scamLinks.get(url)
-        if (existing) return existing
-        const data = this.db.get("links", url) as unknown as ScamLinkData
-        if (!data.url) return null
-        this.scamLinks.set(data.url, data)
-        return data
     }
 
     getPunishmentRole(type: PunishmentType): Role {

@@ -51,17 +51,6 @@ export const DatabaseTables: DatabaseInterface = {
         .setType('INTEGER')
     },
 
-    links: {
-        url: new Column()
-        .setName('url')
-        .setPrimary(true)
-        .setType('TEXT'),
-
-        is_scam: new Column()
-        .setName('is_scam')
-        .setType('BOOLEAN')
-    },
-
     guilds: {
         guild_id: new Column()
         .setName('guild_id')
