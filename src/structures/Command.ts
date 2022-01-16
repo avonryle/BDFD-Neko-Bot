@@ -6,6 +6,7 @@ import cast from "../functions/cast";
 import cleanID from "../functions/cleanID";
 import createSelector from "../functions/createSelector";
 import fetchMember from "../functions/fetchMember";
+import generateAlias from "../functions/generateAlias";
 import inRange from "../functions/inRange";
 import isDiscordID from "../functions/isDiscordID";
 import matches from "../functions/matches";
@@ -29,6 +30,13 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
 
     constructor(data: CommandData<T, K>) {
         this.data = data
+        
+        const alias = generateAlias(this.data.name)
+
+        if (alias) {
+            if (!this.data.aliases) this.data.aliases = []
+            this.data.aliases.push(alias)
+        }
     }
 
     get<V extends keyof CommandData<T, K>>(key: V): CommandData<T, K>[V] {

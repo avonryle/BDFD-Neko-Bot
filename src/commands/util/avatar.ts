@@ -5,6 +5,9 @@ export default new Command<[
     GuildMember | null | User
 ]>({
     name: 'avatar',
+    aliases: [
+        'av'
+    ],
     description: 'gets the avatar of an user.',
     args: [
         {
