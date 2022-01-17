@@ -25,6 +25,7 @@ export default async function(client: NekoClient, message: Message) {
     const found = links.find(c => client.manager.scamDomains.has(c.domain))
     
     if (found) {
+        message.delete().catch(noop)
         console.log(`${chalk.red.bold(`[SCAM DOMAIN]`)} => Identified already found scam domain: ${chalk.yellow.bold(found.domain)}.`)
         sendScamDetectionEmbed(client, message, settings, {
             linkFound: found.domain,
