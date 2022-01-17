@@ -41,7 +41,9 @@ export default async function(client: NekoClient, message: Message) {
             files: message.attachments.map((c, y) => new MessageAttachment(c.url, `${c.name ?? `${y}.png`}`)),
             username: `${fronter.display_name ?? fronter.name} ${data.tag ?? ''}`,
             allowedMentions: {
-                parse: []
+                parse: [
+                    'users'
+                ]
             }
         }
     )
