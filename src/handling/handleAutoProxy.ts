@@ -1,4 +1,4 @@
-import { Message, MessageMentionOptions, TextChannel } from "discord.js";
+import { Message, MessageAttachment, MessageMentionOptions, TextChannel } from "discord.js";
 import { NekoClient } from "../core/NekoClient";
 import cast from "../functions/cast";
 import noop from "../functions/noop";
@@ -32,17 +32,21 @@ export default async function(client: NekoClient, message: Message) {
 
     message.delete().catch(noop)
 
+    const ref = message.reference ? await message.fetchReference().catch(noop) : null
+
     webhook.send(
         {
-            content: message.content,
+            content: ref && ref.content ? `${ref.content.split(/\n/).slice(0, 3).map(c => `> [${c}](${ref.url})`).join('\n')}\n${ref.author} ${message.content}` : message.content || null,
             avatarURL: fronter.avatar_url ?? undefined,
+            files: message.attachments.map((c, y) => new MessageAttachment(c.url, `${c.name ?? `${y}.png`}`)),
             username: `${fronter.display_name ?? fronter.name} ${data.tag ?? ''}`,
             allowedMentions: {
                 parse: []
             }
         }
     )
-    .catch(() => {
+    .catch(err => {
+        if (!err.message.toLowerCase().includes("unknown")) return;
         const data = client.manager.channel(message.channel.id)
         data.webhook_url = null
         client.db.upsert("channels", cast(data), {
