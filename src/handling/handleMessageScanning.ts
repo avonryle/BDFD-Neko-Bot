@@ -5,6 +5,8 @@ import { NekoClient } from "../core/NekoClient";
 import cast from "../functions/cast";
 import extractLinks from "../functions/extractLinks";
 import noop from "../functions/noop";
+import { ScamLinkType } from "../typings/enums/ScamLinkType";
+import { ScamLinkRequest } from "../typings/interfaces/http/ScamLinkRequest";
 
 export default async function(client: NekoClient, message: Message) {
     if (message.channel.type === 'DM' || !message.guild) return;
@@ -19,40 +21,35 @@ export default async function(client: NekoClient, message: Message) {
 
     if (!links.length) return;
 
-    for (let i = 0, len = links.length;i < len;i++) {
-        const {
-            domain,
-            url
-        } = links[i]
+    const review = await axios.get<ScamLinkRequest>(`https://spen.tk/api/scams/isScam?q=${encodeURIComponent(links.map(c => c.url).join(' '))}`).catch(noop)
 
-        const review = await axios.get(``).catch(noop)
+    if (!review || !review.data?.result) {
+        return;
+    };
+    
+    if (review.data.linkFound) console.log(`${chalk.red.bold(`[SCAM DOMAIN]`)} => Identified scam link: ${chalk.yellow.bold(review.data.linkFound)}.`)
 
-        if (!review || !review.data) {
-            break
-        };
-        
-        console.log(`${chalk.red.bold(`[SCAM DOMAIN]`)} => Identified new scam domain: ${chalk.yellow.bold(domain)}.`)
+    message.delete().catch(noop)
+
+    const channel = message.guild.channels.cache.get(settings.scam_links_log_channel_id!)
+
+    if (!channel || channel.isVoice() || channel.isThread() || !channel.isText()) return;
+
+    const embed = client.embed(message.member!, 'RED')
+    .setTitle(`Suspicious Message`)
+    .setDescription(message.content)
+    .addField(`Found at`, `#${message.channel.name} [${message.channel}]`)
+    .addField(`Severity`, `${review.data.result} (${ScamLinkType[review.data.result]})`)
+    .setFooter({
+        text: message.author.id
+    })
     
-        message.delete().catch(noop)
-    
-        const channel = message.guild.channels.cache.get(settings.scam_links_log_channel_id!)
-    
-        if (!channel || channel.isVoice() || channel.isThread() || !channel.isText()) return;
-    
-        const embed = client.embed(message.member!, 'RED')
-        .setTitle(`Suspicious Message`)
-        .setDescription(message.content)
-        .addField(`Found at`, `#${message.channel.name} [${message.channel}]`)
-        .setFooter({
-            text: message.author.id
-        })
-        .addField(`Scam Link`, url)
-    
-        channel.send({
-            embeds: [
-                embed 
-            ]
-        })
-        .catch(noop)
-        }
+    if (review.data.linkFound) embed.addField(`Scam Link`, review.data.linkFound)
+
+    channel.send({
+        embeds: [
+            embed 
+        ]
+    })
+    .catch(noop)
 }

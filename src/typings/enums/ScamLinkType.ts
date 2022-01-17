@@ -1,0 +1,6 @@
+export enum ScamLinkType {
+    SAFE,
+    TRAILING_SLASH_OR_PHRASE,
+    TRAILING_SLASH_AND_PHRASE,
+    SCAM_LINK
+}
