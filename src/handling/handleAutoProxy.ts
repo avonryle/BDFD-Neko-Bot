@@ -36,7 +36,7 @@ export default async function(client: NekoClient, message: Message) {
 
     webhook.send(
         {
-            content: ref && ref.content ? `${ref.content.split(/\n/).slice(0, 3).map(c => `> [${c}](${ref.url})`).join('\n')}\n${ref.author} ${message.content}` : message.content || null,
+            content: ref ? ref.content ? `${ref.content.split(/\n/).slice(0, 3).map(c => `> [${c}](${ref.url})`).join('\n')}\n${ref.author} ${message.content}` : `> [Click to see attachments](${ref.url})\n${ref.author} ${message.content}` : message.content || null,
             avatarURL: fronter.avatar_url ?? undefined,
             files: message.attachments.map((c, y) => new MessageAttachment(c.url, `${c.name ?? `${y}.png`}`)),
             username: `${fronter.display_name ?? fronter.name} ${data.tag ?? ''}`,
