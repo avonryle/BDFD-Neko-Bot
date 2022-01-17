@@ -21,6 +21,7 @@
     "chalk": "^4.1.2",
     "dbdts.db": "^4.0.1",
     "discord.js": "^13.6.0",
+    "lavacoffee": "^1.5.2",
     "ms-utility": "^3.2.0"
   }
 }

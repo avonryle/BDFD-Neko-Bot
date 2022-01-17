@@ -25,10 +25,13 @@ import { PunishmentRoles } from "../util/constants/PunishmentRoles";
 import { LogExecutionTime } from "../util/decorators/LogExecutionTime";
 import { WrapAsyncMethodWithErrorHandler } from "../util/decorators/WrapMethodWithErrorHandler";
 import { NekoClient } from "./NekoClient";
+import { CoffeeLava, LavaEvents } from "lavacoffee"
+import { LavalinkGuild } from "../structures/LavalinkGuild";
 
 export class NekoManager {
     client: NekoClient
-
+    
+    guilds = new Collection<string, LavalinkGuild>()
     settings = new Collection<string, GuildSettingsData>()
 
     systemMembers = new Collection<string, SystemMemberData>()
@@ -42,6 +45,16 @@ export class NekoManager {
     esnipes = new Collection<string, Message<true>>()
     snipes = new Collection<string, Message<true>>()
 
+    lavalink = new CoffeeLava({
+        defaultSearchPlatform: 'yt',
+        send: (id, packet) => {
+            this.client.guilds.cache.get(id)!.shard.send(packet)
+        },
+        autoPlay: false,
+        autoReplay: true,
+        autoResume: true
+    })
+
     db = new Database({
         path: './neko.db',
         sanitize: true,
@@ -49,12 +62,16 @@ export class NekoManager {
     })
 
     commands = new Collection<string, Command>()
-    events = new Collection<keyof ClientEvents, DiscordEvent>()
+    events = new Collection<string, Collection<string, unknown>>()
 
     constructor(client: NekoClient) {
         this.client = client
     }
 
+    guild(id: string) {
+        return this.guilds.ensure(id, () => new LavalinkGuild(this, id))
+    }
+    
     @WrapAsyncMethodWithErrorHandler()
     async getChannelWebhook(channel: TextChannel): Promise<Option<WebhookClient>> {
         const data = this.channel(channel.id)
@@ -185,23 +202,33 @@ export class NekoManager {
 
         this.events.clear()
 
-        for (const file of readdirSync(`./dist/events/`)) {
-            const name = file.split('.js')[0] as keyof ClientEvents
+        for (const folder of readdirSync(`./dist/events/`)) {
+            for (const file of readdirSync(`./dist/events/${folder}`)) {
+                const name = file.split('.js')[0]
 
-            const path = `../events/${file}`
-
-            if (ref) {
-                delete require.cache[require.resolve(path)]
+                const path = `../events/${folder}/${file}`
+    
+                if (ref) {
+                    delete require.cache[require.resolve(path)]
+                }
+    
+                const event = require(path).default
+    
+                const bind = event.bind(this.client)
+    
+                this.events.ensure(folder, () => new Collection()).set(name, bind)
+                if (folder === 'discord.js') {
+                    this.client.on(name, bind)
+                } else {
+                    this.lavalink.on(name as keyof LavaEvents, bind)
+                }
             }
-
-            const event = require(path).default as DiscordEvent
-
-            const bind = event.bind(this.client)
-
-            this.events.set(name, bind)
-            this.client.on(name, bind)
         }
 
         return this
+    }
+
+    get node() {
+        return this.lavalink.nodes.get('neko')
     }
 }

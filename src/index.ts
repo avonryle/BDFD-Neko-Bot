@@ -15,7 +15,8 @@ const client = new NekoClient({
         "DIRECT_MESSAGES",
         "GUILDS",
         "GUILD_MESSAGES",
-        'GUILD_MEMBERS'
+        'GUILD_MEMBERS',
+        'GUILD_VOICE_STATES'
     ],
     presence: {
         status: 'idle',

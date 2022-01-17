@@ -17,6 +17,7 @@ import { toPlural } from "../functions/toPlural";
 import toTitleCase from "../functions/toTitleCase";
 import handleAutoProxy from "../handling/handleAutoProxy";
 import { ArgType } from "../typings/enums/ArgType";
+import { PlayerState } from "../typings/enums/PlayerState";
 import { RejectionType } from "../typings/enums/RejectionType";
 import { ArgData } from "../typings/interfaces/ArgData";
 import { CommandData } from "../typings/interfaces/CommandData";
@@ -429,7 +430,6 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
             return false
         }
 
-
         if (this.data.roles?.length && !this.data.roles.some(c => message.member?.roles.cache.has(c))) {
             if (send) channel.send({
                 embeds: [
@@ -441,6 +441,64 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
             return false
         }
 
+        const guild = client.manager.guild(message.guildId!)
+
+        if (this.data.sameVoice && !guild.isUserWithBot(message.member!) && !this.data.ignoreIfNoVoice) {
+            if (send) channel?.send({
+                embeds: [
+                    client.embed(message.member!, 'RED')
+                    .setTitle(`Voice Error`)
+                    .setDescription(`You must be connected to the same channel as the bot.`)
+                ]
+            })
+            .catch(noop)
+            return false
+        } else if (this.data.sameVoice && guild.isBotInVoice() && message.guild!.me?.voice.channelId !== message.member!.voice.channelId) {
+            if (send) channel?.send({
+                embeds: [
+                    client.embed(message.member!, 'RED')
+                    .setTitle(`Voice Error`)
+                    .setDescription(`You must be connected to the same channel as the bot.`)
+                ]
+            })
+            .catch(noop)
+            return false
+        }
+
+        if (this.data.userInVoice && !message.member?.voice.channelId) {
+            if (send) channel?.send({
+                embeds: [
+                    client.embed(message.member!, 'RED')
+                    .setTitle(`Voice Error`)
+                    .setDescription(`You must be connected to a voice channel.`)
+                ]
+            })
+            .catch(noop)
+            return false
+        }
+
+        if (this.data.botInVoice && !guild.isBotInVoice() && !this.data.ignoreIfNoVoice) {
+            if (send) channel?.send({
+                embeds: [
+                    client.embed(message.member!, 'RED')
+                    .setTitle(`Voice Error`)
+                    .setDescription(`The bot must be connected to a voice channel.`)
+                ]
+            })
+            .catch(noop)
+            return false
+        }
+
+        if (this.data.states?.length && !this.data.states.some(c => c === guild.state)) {
+            if (send) channel.send({
+                embeds: [
+                    client.embed(message.member!, 'RED')
+                    .setTitle(`Invalid State`)
+                    .setDescription(`Player state must be in one of these states: ${this.data.states.map(c => PlayerState[c]).join(', ')} in order to execute this commannd.`)
+                ]
+            })
+            return false
+        }
         return true
     }
 }

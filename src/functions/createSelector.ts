@@ -1,4 +1,5 @@
 import { Collection, GuildBasedChannel, GuildChannel, GuildMember, Message, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu, Role, SelectMenuInteraction, User } from "discord.js";
+import { CoffeeTrack } from "lavacoffee";
 import { Option } from "../typings/types/Option";
 import noop from "./noop";
 
@@ -10,7 +11,7 @@ import noop from "./noop";
  * @param limit The limit of embeds.
  */
 export default async function<
-    T extends Role | GuildBasedChannel  | GuildMember | User
+    T extends Role | GuildBasedChannel | GuildMember | User | CoffeeTrack
 >(
     message: Message,
     options?: Option<Array<T> | T | Collection<string, T>>,
@@ -35,7 +36,7 @@ export default async function<
     .setMinValues(1)
     .setCustomId(`selector_${message.author.id}`)
 
-    for (let i = 0, len = arr.length;i < len;i++) {
+    for (let i = 0, len = limit > arr.length ? arr.length : limit ?? arr.length;i < len;i++) {
         const item = arr[i]
 
         const embed = new MessageEmbed()
@@ -96,6 +97,21 @@ export default async function<
                 [
                     {
                         label: item.tag,
+                        value: i.toString()
+                    }
+                ]
+            )
+        } else if (item instanceof CoffeeTrack) {
+            embed.setColor('RANDOM')
+            .setAuthor({
+                name: item.title,
+                iconURL: item.displayThumbnail('2048')
+            })
+
+            menu.addOptions(
+                [
+                    {
+                        label: item.title,
                         value: i.toString()
                     }
                 ]

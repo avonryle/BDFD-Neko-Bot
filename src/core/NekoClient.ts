@@ -66,6 +66,10 @@ export class NekoClient extends Client<true> {
         return config
     }
 
+    get node() {
+        return this.manager.node
+    }
+
     get changeNicknameChannel() {
         return this.mainGuild.channels.cache.get(this.build.change_nickname_channel_id)! as TextChannel
     }
@@ -105,6 +109,16 @@ export class NekoClient extends Client<true> {
 
         this.db.once("ready", () => {
             console.log(`Database ready`)
+            
+            this.on("raw", data => this.manager.lavalink.updateVoiceData(data))
+
+            this.manager.lavalink.add({
+                name: 'neko',
+                password: this.config.lavalink_password,
+                url: `${this.config.lavalink_url}:${this.config.port}`,
+                secure: false
+            })
+
             this.login(this.build.token)
         })
 
