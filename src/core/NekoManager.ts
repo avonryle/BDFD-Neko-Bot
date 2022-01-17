@@ -120,9 +120,9 @@ export class NekoManager {
 
         if (existing) return existing
 
-        const request = await axios.get<SystemMemberFrontRequest>(`https://api.pluralkit.me/v2/systems/${id}/fronters`)
+        const request = await axios.get<SystemMemberFrontRequest>(`https://api.pluralkit.me/v2/systems/${id}/fronters`).catch(noop)
 
-        if (!request.data.members.length) return null
+        if (!request || !request.data.members.length) return null
 
         const member = request.data.members[0]
 
