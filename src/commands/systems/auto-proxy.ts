@@ -29,7 +29,7 @@ export default new Command({
                 .setTitle(`Settings Updated`)
                 .setDescription(`Auto proxy is now ${old ? `disabled` : 'enabled'}.`)
                 .setFooter({
-                    text: `You can get off it by using a backslash at the start of a message or by using this command again.`
+                    text: `You can get off it by using this command again.`
                 })
             ]
         })

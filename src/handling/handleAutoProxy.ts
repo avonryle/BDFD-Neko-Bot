@@ -19,11 +19,6 @@ export default async function(client: NekoClient, message: Message) {
     if (!data.autosend) return;
 
     if (message.content.startsWith('\\')) {
-        data.autosend = false
-        client.db.upsert("systems", cast(data), {
-            column: 'user_id',
-            equals: message.author.id
-        })
         return;
     }
 
