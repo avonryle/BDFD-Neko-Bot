@@ -15,6 +15,7 @@ import removeScripts from "../functions/removeScripts";
 import snakeToTitle from "../functions/snakeToTitle";
 import { toPlural } from "../functions/toPlural";
 import toTitleCase from "../functions/toTitleCase";
+import handleAutoProxy from "../handling/handleAutoProxy";
 import { ArgType } from "../typings/enums/ArgType";
 import { RejectionType } from "../typings/enums/RejectionType";
 import { ArgData } from "../typings/interfaces/ArgData";
@@ -55,13 +56,19 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
 
         const prefix = client.prefixes.find(c => message.content.startsWith(c))
 
-        if (!prefix) return;
+        if (!prefix) {
+            await handleAutoProxy(client, message)
+            return;
+        };
 
         const rawArgs = message.content.slice(prefix.length).trim().split(/ +/)
 
         const cmd = rawArgs.shift()?.toLowerCase()
 
-        if (!cmd) return;
+        if (!cmd) {
+            await handleAutoProxy(client, message)
+            return;
+        };
 
         const command = client.manager.commands.get(cmd) ?? client.manager.commands.find(
             c => c.data.name === cmd || removeScripts(c.data.name) === removeScripts(cmd) || (
@@ -71,7 +78,10 @@ export class Command<T = unknown[], K extends ParsedContentData["flags"] = Parse
             )
         )
 
-        if (!command) return;
+        if (!command) {
+            await handleAutoProxy(client, message)
+            return
+        };
 
         const perms = await command.permissionsFor(client, message)
 

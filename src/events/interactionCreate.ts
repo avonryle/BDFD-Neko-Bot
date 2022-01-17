@@ -6,6 +6,7 @@ import handleAppealRequest from "../handling/interactions/handleAppealRequest";
 import handleGiveawayRequest from "../handling/interactions/handleGiveawayRequest";
 import handleHelpCommand from "../handling/interactions/handleHelpCommand";
 import handleNicknameRequest from "../handling/interactions/handleNicknameRequest";
+import handleSystemPagination from "../handling/interactions/handleSystemPagination";
 
 export default createDiscordEvent("interactionCreate", async function(i) {
     if (i.isButton()) {
@@ -14,5 +15,6 @@ export default createDiscordEvent("interactionCreate", async function(i) {
         ErrorHandler.wrap(handleGiveawayRequest).runAsync(this, cast(i))
         ErrorHandler.wrap(handleHelpCommand).runAsync(this, cast(i))
         ErrorHandler.wrap(handleAltBan).runAsync(this, cast(i))
+        ErrorHandler.wrap(handleSystemPagination).runAsync(this, cast(i))
     }
 })

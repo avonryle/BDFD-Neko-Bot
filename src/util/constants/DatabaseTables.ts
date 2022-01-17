@@ -51,6 +51,33 @@ export const DatabaseTables: DatabaseInterface = {
         .setType('INTEGER')
     },
 
+    systems: {
+        user_id: new Column()
+        .setName('user_id')
+        .setType('TEXT')
+        .setPrimary(true),
+
+        autosend: new Column()
+        .setName('autosend')
+        .setDefault(false)
+        .setType('BOOLEAN'),
+
+        tag: new Column()
+        .setName('tag')
+        .setType('TEXT')
+    },
+
+    channels: {
+        channel_id: new Column()
+        .setName('channel_id')
+        .setType('TEXT')
+        .setPrimary(true),
+
+        webhook_url: new Column()
+        .setName('webhook_url')
+        .setType('TEXT')
+    },
+    
     guilds: {
         guild_id: new Column()
         .setName('guild_id')
