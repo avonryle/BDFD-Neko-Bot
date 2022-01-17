@@ -10,6 +10,7 @@ export default new Command<[number]>({
         {
             name: 'position',
             min: 0,
+            required: true,
             type: 'TIME'
         }
     ],

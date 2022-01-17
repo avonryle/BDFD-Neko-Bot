@@ -10,7 +10,8 @@ export default new Command<[number]>({
             name: 'volume',
             min: 0,
             max: 200,
-            type: 'NUMBER'
+            type: 'NUMBER',
+            required: true
         }
     ],
     execute: async function(message, [ volume ]) {
