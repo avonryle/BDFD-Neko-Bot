@@ -37,6 +37,7 @@ export class NekoManager {
     parser = new Parser(DurationUnits)
     giveaways = new Collection<string, Giveaway>()
     channels = new Collection<string, ChannelData>()
+    scamDomains = new Set<string>()
 
     esnipes = new Collection<string, Message<true>>()
     snipes = new Collection<string, Message<true>>()
