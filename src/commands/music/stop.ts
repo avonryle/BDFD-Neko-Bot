@@ -10,7 +10,7 @@ export default new Command({
         const guild = this.manager.guild(message.guildId!)
 
         guild.queue = []
-        guild.current = 0
+        guild.current = -1
         guild.player.stop()
 
         message.react('✅')
