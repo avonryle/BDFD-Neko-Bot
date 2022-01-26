@@ -27,6 +27,7 @@ import { WrapAsyncMethodWithErrorHandler } from "../util/decorators/WrapMethodWi
 import { NekoClient } from "./NekoClient";
 import { CoffeeLava, LavaEvents } from "lavacoffee"
 import { LavalinkGuild } from "../structures/LavalinkGuild";
+import { DatabaseTables } from "../typings/interfaces/database/DatabaseTables";
 
 export class NekoManager {
     client: NekoClient
@@ -55,7 +56,7 @@ export class NekoManager {
         autoResume: true
     })
 
-    db = new Database({
+    db = new Database<DatabaseTables>({
         path: './neko.db',
         sanitize: true,
         length: 10

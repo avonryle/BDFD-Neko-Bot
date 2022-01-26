@@ -68,6 +68,10 @@ export const DatabaseTables: DatabaseInterface = {
     },
 
     channels: {
+        old_pin_message_id: new Column()
+        .setName('old_pin_message_id')
+        .setType('TEXT'),
+
         channel_id: new Column()
         .setName('channel_id')
         .setType('TEXT')
@@ -79,6 +83,14 @@ export const DatabaseTables: DatabaseInterface = {
     },
     
     guilds: {
+        pin_message_id: new Column()
+        .setName('pin_message_id')
+        .setType('TEXT'),
+
+        sticky_message_channel_id: new Column()
+        .setName('sticky_message_channel_id')
+        .setType('TEXT'),
+        
         guild_id: new Column()
         .setName('guild_id')
         .setType('TEXT')

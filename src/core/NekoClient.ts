@@ -5,6 +5,7 @@ import { WrapAsyncMethodWithErrorHandler } from "../util/decorators/WrapMethodWi
 import { NekoManager } from "./NekoManager";
 import { DatabaseTables } from "../util/constants/DatabaseTables";
 import { Column } from "dbdts.db";
+import { DatabaseInterface } from "../typings/interfaces/database/DatabaseInterface";
 
 export class NekoClient extends Client<true> {
     #mode!: BuildType
@@ -104,7 +105,7 @@ export class NekoClient extends Client<true> {
 
         for (const [ table, columns ] of Object.entries(DatabaseTables)) {
             const got = Object.values<Column>(columns)
-            this.db.createTable(table).addColumns(got)
+            this.db.createTable(table as keyof DatabaseInterface).addColumns(got)
         }
 
         this.db.once("ready", () => {
