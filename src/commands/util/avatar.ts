@@ -31,7 +31,7 @@ export default new Command<[
             )
         )
 
-        if (member && member.avatar) {
+        if (member && member.avatar && member.id === user.id) {
             embeds.push(
                 new MessageEmbed()
                 .setTitle(`Here's ${user.username}'s server avatar`)
