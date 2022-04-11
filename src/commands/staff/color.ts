@@ -1,6 +1,7 @@
 import { MessageEmbed, MessageAttachment } from "discord.js";
 import { Command } from "../../structures/Command";
 import { createCanvas, loadImage } from 'canvas';
+import StaffRoles from "../../util/constants/StaffRoles";
 
 export default new Command<[string]>({
     name: 'color',
