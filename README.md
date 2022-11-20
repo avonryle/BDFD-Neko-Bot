@@ -1,4 +1,4 @@
-# BDFD Neko Bot
-Don't ask what happened to Rust rewrite.
+# NeoSurphos
+a fork of the orginally made BDFD Neko Bot maintained by me as the original developer (@yuzutheneko) abandoned this project
 
-<b>THIS PROJECT IS DISCONTINUED. Originally made by @yuzutheneko</b>
+<b> most of the files from the original bot will be deleted as this fork is to maintain my upcoming servers and projects </b> 
